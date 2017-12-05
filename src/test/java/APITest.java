@@ -4,6 +4,7 @@ import model.Program;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -18,13 +19,30 @@ import static helpers.ProgramTransformer.*;
 public class APITest extends AssuredBase {
     private final String urlIndex = "/channel";
     private final String urlCurrentTime = "/time";
-    private final String urlChannel = "http://www.vsetv.com/export/megogo/epg/3.xml";
 
 
-    @Test(groups = {"api"})
-    public void checkUsersResponseStatusAndCountTest() throws IOException, ParseException {
+    /**
+     * List of channels used in verification
+     *
+     * @return {Object[][]}
+     */
+    @DataProvider(name = "channels list")
+    public static Object[][] channels() {
+        return new Object[][]{
+                {"295", "http://www.vsetv.com/export/megogo/epg/3.xml"},
+        };
+    }
+
+    /**
+     * Checks if programs from Megogo API response equal to given channel programs schedule
+     *
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test(groups = {"api"}, dataProvider = "channels list")
+    public void checkUsersResponseStatusAndCountTest(String externalId, String urlChannel) throws IOException, ParseException {
         Response res = given()
-                .param("external_id", "295")
+                .param("external_id", externalId)
                 .when().get(urlIndex)
                 .then().contentType(ContentType.JSON)
                 .extract().response();
@@ -32,34 +50,73 @@ public class APITest extends AssuredBase {
         JSONArray arrayOfMegogoPrograms = getMegogoPrograms(res);
         List<Program> megogoPrograms = getProgramsList(arrayOfMegogoPrograms, false);
 
-        JSONArray arrayOfChannelPrograms = getChannelPrograms(getJsonObjectOfXmlFromUrl(urlChannel));
-        List<Program> channelPrograms = getProgramsList(arrayOfChannelPrograms, true);
-        List<Program> channelProgramsToCompare = new ArrayList<Program>();
-
-        long firstProgramStart = megogoPrograms.get(0).getEnd();
-        long lastProgramEnd = megogoPrograms.get(megogoPrograms.size() - 1).getEnd();
-
-        for (Program channelProgram : channelPrograms) {
-            if (channelProgram.getStart() >= firstProgramStart && channelProgram.getEnd() <= lastProgramEnd) {
-                channelProgramsToCompare.add(channelProgram);
-            }
-        }
+        long currentTimestamp = getMegogoCurrentTimestamp();
+        long lastProgramStart = megogoPrograms.get(megogoPrograms.size() - 1).getStart();
+        List<Program> channelProgramsToCompare = getChannelProgramsToCompare(urlChannel, currentTimestamp, lastProgramStart);
 
         System.out.println(megogoPrograms);
         System.out.println(channelProgramsToCompare);
+
+        for (int i = 0; i < megogoPrograms.size(); i++) {
+            Assert.assertEquals(megogoPrograms.get(i), channelProgramsToCompare.get(i));
+        }
     }
 
+    /**
+     * Returns programs from Megogo API response
+     *
+     * @param {JSONObject} responseObject
+     * @return {JSONArray}
+     * @throws IOException
+     */
     private JSONArray getMegogoPrograms(Response responseObject) throws IOException {
         JSONObject jsonObject = new JSONObject(responseObject.asString());
         JSONObject dataObject = jsonObject.getJSONArray("data").getJSONObject(0);
         return dataObject.getJSONArray("programs");
     }
 
+    /**
+     * Returns channel programs from channel program schedule
+     *
+     * @param {JSONObject} responseObject
+     * @return {JSONArray}
+     * @throws IOException
+     */
     private JSONArray getChannelPrograms(JSONObject responseObject) throws IOException {
         JSONObject programmObject = responseObject.getJSONObject("tv");
         return programmObject.getJSONArray("programme");
     }
 
+    /**
+     * Returns selection from channel programs schedule to compare by start and end time
+     *
+     * @param {String} urlChannel
+     * @param {long}   startSelectionTime
+     * @param {long}   endSelectionTime
+     * @return {List <Program>}
+     * @throws IOException
+     * @throws ParseException
+     */
+    private List<Program> getChannelProgramsToCompare(String urlChannel, long startSelectionTime, long endSelectionTime) throws IOException, ParseException {
+        JSONArray arrayOfChannelPrograms = getChannelPrograms(getJsonObjectOfXmlFromUrl(urlChannel));
+        List<Program> channelPrograms = getProgramsList(arrayOfChannelPrograms, true);
+
+        List<Program> channelProgramsToCompare = new ArrayList<Program>();
+
+        for (Program channelProgram : channelPrograms) {
+            if (channelProgram.getEnd() >= startSelectionTime && channelProgram.getStart() <= endSelectionTime) {
+                channelProgramsToCompare.add(channelProgram);
+            }
+        }
+
+        return channelProgramsToCompare;
+    }
+
+    /**
+     * Returns current time in UNIX timestamp from Megogo API response
+     *
+     * @return {long}
+     */
     private long getMegogoCurrentTimestamp() {
         Response res = given()
                 .when().get(urlCurrentTime)

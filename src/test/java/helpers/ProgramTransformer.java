@@ -14,13 +14,18 @@ import java.util.List;
 public class ProgramTransformer {
 
     /**
-     * @return ArrayList programsList
+     * Returns list of Program objects from channel programs schedule or from Megogo API response
+     *
+     * @param {JSONArray} arrayOfPrograms
+     * @param {boolean}   isChannel
+     * @return
+     * @throws ParseException
      */
-    public static List<Program> getProgramsList(JSONArray array, boolean isChannel) throws ParseException {
+    public static List<Program> getProgramsList(JSONArray arrayOfPrograms, boolean isChannel) throws ParseException {
         List<Program> programsList = new ArrayList<Program>();
 
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject innerObject = array.getJSONObject(i);
+        for (int i = 0; i < arrayOfPrograms.length(); i++) {
+            JSONObject innerObject = arrayOfPrograms.getJSONObject(i);
 
             Program program = new Program();
 
@@ -49,12 +54,16 @@ public class ProgramTransformer {
         return programsList;
     }
 
+    /**
+     * Returns UNIX timestamp of string date
+     *
+     * @param {String} dateString
+     * @return {long}
+     * @throws ParseException
+     */
     private static long convertToUnixTimestamp(String dateString) throws ParseException {
 
-//        String dateString = "2017-12-04 17:06:34 +0200";
-//        String dateString = "Dec 4, 2017 4:10:00 PM";";
-        String format = "yyyy-MM-dd hh:mm:ss z";
-//        String format = "MMM d, yyyy h:mm:ss a";
+        String format = "yyyy-MM-dd HH:mm:ss z";
         DateFormat dateFormat = new SimpleDateFormat(format);
         Date date = dateFormat.parse(dateString);
         long unixTime = date.getTime() / 1000;
