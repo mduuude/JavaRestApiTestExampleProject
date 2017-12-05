@@ -17,7 +17,6 @@ import static com.jayway.restassured.RestAssured.given;
 import static helpers.XmlParser.*;
 import static helpers.ProgramTransformer.*;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class APITest extends AssuredBase {
     private final String urlIndex = "/channel";
