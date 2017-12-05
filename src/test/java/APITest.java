@@ -96,8 +96,8 @@ public class APITest extends AssuredBase {
      * @throws IOException
      */
     private JSONArray getChannelPrograms(JSONObject responseObject) throws IOException {
-        JSONObject programmObject = responseObject.getJSONObject("tv");
-        return programmObject.getJSONArray("programme");
+        JSONObject programsObject = responseObject.getJSONObject("tv");
+        return programsObject.getJSONArray("programme");
     }
 
     /**
