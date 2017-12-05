@@ -1,3 +1,4 @@
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import model.Program;
@@ -15,11 +16,12 @@ import java.util.List;
 import static com.jayway.restassured.RestAssured.given;
 import static helpers.XmlParser.*;
 import static helpers.ProgramTransformer.*;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class APITest extends AssuredBase {
     private final String urlIndex = "/channel";
     private final String urlCurrentTime = "/time";
-
 
     /**
      * List of channels used in verification
@@ -41,25 +43,37 @@ public class APITest extends AssuredBase {
      */
     @Test(groups = {"api"}, dataProvider = "channels list")
     public void checkUsersResponseStatusAndCountTest(String externalId, String urlChannel) throws IOException, ParseException {
-        Response res = given()
+        Response response = given()
                 .param("external_id", externalId)
                 .when().get(urlIndex)
                 .then().contentType(ContentType.JSON)
                 .extract().response();
 
-        JSONArray arrayOfMegogoPrograms = getMegogoPrograms(res);
+        JSONArray arrayOfMegogoPrograms = getMegogoPrograms(response);
         List<Program> megogoPrograms = getProgramsList(arrayOfMegogoPrograms, false);
 
         long currentTimestamp = getMegogoCurrentTimestamp();
         long lastProgramStart = megogoPrograms.get(megogoPrograms.size() - 1).getStart();
         List<Program> channelProgramsToCompare = getChannelProgramsToCompare(urlChannel, currentTimestamp, lastProgramStart);
 
-        System.out.println(megogoPrograms);
-        System.out.println(channelProgramsToCompare);
-
         for (int i = 0; i < megogoPrograms.size(); i++) {
             Assert.assertEquals(megogoPrograms.get(i), channelProgramsToCompare.get(i));
         }
+    }
+
+    /**
+     * Checks if Megogo API response structure equal to given JSON Scheme
+     *
+     * @throws ProcessingException
+     * @throws IOException
+     */
+    @Test(groups = {"api"})
+    public void checkResponseStructure() throws ProcessingException, IOException {
+        given()
+                .param("external_id", "295")
+                .when().get(urlIndex)
+                .then().assertThat().body(matchesJsonSchemaInClasspath("schema.json"))
+        ;
     }
 
     /**

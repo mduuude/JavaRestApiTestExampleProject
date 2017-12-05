@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Channel",
+  "description": "List of channel programs",
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "string"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "title": "data",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "external_id": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "title": "programs",
+              "type": "object",
+              "properties": {
+                "external_id": {
+                  "type": "number"
+                },
+                "object_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "year": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "schedule_string": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "genre": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "external_id": {
+                      "type": "number"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "category": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "external_id": {
+                      "type": "number"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "pictures": {
+                  "type": "object",
+                  "properties": {
+                    "original": {
+                      "type": "string"
+                    },
+                    "105x85": {
+                      "type": "string"
+                    },
+                    "980x560": {
+                      "type": "string"
+                    },
+                    "105x60": {
+                      "type": "string"
+                    },
+                    "125x70": {
+                      "type": "string"
+                    },
+                    "480x330": {
+                      "type": "string"
+                    },
+                    "1600x520": {
+                      "type": "string"
+                    },
+                    "230x130": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "virtual_object_id": {
+                  "type": "string"
+                },
+                "start": {
+                  "type": "string"
+                },
+                "start_timestamp": {
+                  "type": "number"
+                },
+                "end": {
+                  "type": "string"
+                },
+                "end_timestamp": {
+                  "type": "number"
+                },
+                "grouped_programs": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "schedule_type": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "pictures": {
+            "type": "object",
+            "properties": {
+              "original": {
+                "type": "string"
+              },
+              "105x85": {
+                "type": "string"
+              },
+              "monochrome_logo": {
+                "type": "string"
+              },
+              "180x180": {
+                "type": "string"
+              },
+              "980x560": {
+                "type": "string"
+              },
+              "88x65": {
+                "type": "string"
+              },
+              "88x88": {
+                "type": "string"
+              },
+              "105x105": {
+                "type": "string"
+              },
+              "40x40": {
+                "type": "string"
+              },
+              "150x150": {
+                "type": "string"
+              },
+              "1600x520": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
