@@ -23,4 +23,4 @@ Run scripts:
 
 * /src/test/java/helpers - used custom tools for testing purposes
 * /src/test/java - test classes itself, respectively **APITest.java**
-* /src/resources - used non-Java artifacts
+* /src/resources - used non-Java artifacts 
