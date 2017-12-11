@@ -1,5 +1,5 @@
 # Java RestApi Example Test Project
-Test site content with DB data comparing + test API response example
+Validation API responses example
 
 ## Prerequisites
 * **JDK >= 1.8.0_131**;
